@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">StyleableShareDialog</string>
+    <string name="default_dialog_title">Share via &#8230;</string>
+</resources>
