@@ -1,5 +1,6 @@
 package ogiba.styleablesharedialog.ShareDialog;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -8,6 +9,8 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,8 +31,9 @@ import ogiba.styleablesharedialog.ShareDialog.Models.ShareActionModel;
  * Created by ogiba on 09.01.2017.
  */
 
-public class ShareDialog extends DialogFragment {
+public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnShareActionSelect {
     public static final String TYPE_TEXT = "text/*";
+    private static final String SHARE_DIALOG_TAG = "ShareDialog";
 
     private RecyclerView sharableAppList;
     @Nullable
@@ -46,6 +50,8 @@ public class ShareDialog extends DialogFragment {
     private Integer headerLayoutID;
     private Integer footerLayoutID;
     private boolean isHorizontal;
+
+    private String shareTextContent;
 
     public static ShareDialog newInstance(String shareType) {
         Bundle args = new Bundle();
@@ -72,10 +78,21 @@ public class ShareDialog extends DialogFragment {
         return fragment;
     }
 
+    public void show(FragmentManager fragmentManager) {
+        this.show(fragmentManager, SHARE_DIALOG_TAG);
+    }
+
+    public void show(FragmentTransaction fragmentTransaction) {
+        this.show(fragmentTransaction, SHARE_DIALOG_TAG);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         parseExtras();
+
+        if (savedInstanceState != null)
+            parseSavedInstance(savedInstanceState);
     }
 
     @Override
@@ -111,6 +128,17 @@ public class ShareDialog extends DialogFragment {
             adapter.setItems(shareActionModels);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(Builder.TAG_TEXT_CONTENT, shareTextContent);
+    }
+
+    @Override
+    public void onSelect(ShareActionModel model, int position) {
+        shareContent(model);
+    }
+
     private void parseExtras() {
         Bundle args = getArguments();
         if (args != null) {
@@ -121,6 +149,10 @@ public class ShareDialog extends DialogFragment {
             this.footerLayoutID = args.getInt(Builder.TAG_LAYOUT_FOOTER);
             this.isHorizontal = args.getBoolean(Builder.TAG_ORIENTATION_TAG);
         }
+    }
+
+    private void parseSavedInstance(Bundle instance) {
+        this.shareTextContent = instance.getString(Builder.TAG_TEXT_CONTENT);
     }
 
     private void attachCustomLayoutToView() {
@@ -156,6 +188,7 @@ public class ShareDialog extends DialogFragment {
 
     private void setupAdapter() {
         this.adapter = new ShareItemsAdapter(getContext(), isHorizontal);
+        this.adapter.setCallbackListener(this);
     }
 
     private void setupTitle() {
@@ -198,6 +231,16 @@ public class ShareDialog extends DialogFragment {
             return LinearLayoutManager.VERTICAL;
     }
 
+    private void shareContent(ShareActionModel model) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        if (model.getAppInfo() != null)
+            intent.setComponent(new ComponentName(model.getAppInfo().activityInfo.packageName,
+                    model.getAppInfo().activityInfo.name));
+        intent.setType(shareType);
+        intent.putExtra(Intent.EXTRA_TEXT, shareTextContent);
+        startActivity(intent);
+    }
+
     protected ArrayList<ShareActionModel> getSharableApps() {
         PackageManager pm = getActivity().getPackageManager();
         Intent intent = new Intent(Intent.ACTION_SEND);
@@ -213,6 +256,10 @@ public class ShareDialog extends DialogFragment {
         return shareActionModels;
     }
 
+    public void setShareContent(String shareTextContent) {
+        this.shareTextContent = shareTextContent;
+    }
+
     public static class Builder {
         private static final String TAG_TYPE_TEXT = "text";
         private static final String TAG_TITLE = "title";
@@ -220,6 +267,7 @@ public class ShareDialog extends DialogFragment {
         private static final String TAG_LAYOUT_FOOTER = "layoutFooter";
         private static final String TAG_ROWS_NUMBER = "numberOfRows";
         private static final String TAG_ORIENTATION_TAG = "orientation";
+        private static final String TAG_TEXT_CONTENT = "simpleTextContent";
 
         private String type;
         private String title;

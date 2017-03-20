@@ -19,17 +19,20 @@ import ogiba.styleablesharedialog.ShareDialog.Models.ShareActionModel;
  * Created by ogiba on 08.02.2017.
  */
 
-public class ShareItemsAdapter extends RecyclerView.Adapter<ShareItemsAdapter.SharableViewHolder> {
+public class ShareItemsAdapter extends RecyclerView.Adapter<ShareItemsAdapter.SharableViewHolder>
+        implements OnItemClickListener{
+
     private Context context;
     private List<ShareActionModel> items;
     private boolean isHorizontal;
+
+    private OnShareActionSelect callback;
 
     public ShareItemsAdapter(Context context, boolean isHorizontal) {
         this.context = context;
         this.isHorizontal = isHorizontal;
         this.items = new ArrayList<>();
     }
-
 
     @Override
     public SharableViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -38,7 +41,7 @@ public class ShareItemsAdapter extends RecyclerView.Adapter<ShareItemsAdapter.Sh
             itemLayout = R.layout.item_share_action_horizontal;
 
         View layout = LayoutInflater.from(context).inflate(itemLayout, parent, false);
-        return new SharableViewHolder(layout);
+        return new SharableViewHolder(layout, this);
     }
 
     @Override
@@ -53,22 +56,51 @@ public class ShareItemsAdapter extends RecyclerView.Adapter<ShareItemsAdapter.Sh
         return items.size();
     }
 
+    @Override
+    public void onItemClick(View v, int position) {
+        if(callback != null)
+            callback.onSelect(items.get(position), position);
+    }
+
     public void setItems(List<ShareActionModel> items) {
         this.items.clear();
         this.items.addAll(items);
         notifyDataSetChanged();
     }
 
-    public class SharableViewHolder extends RecyclerView.ViewHolder {
+    public void setCallbackListener(OnShareActionSelect callback) {
+        this.callback = callback;
+    }
+
+    public class SharableViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public View item;
         public ImageView icon;
         public TextView label;
+
+        private OnItemClickListener listener;
 
         public SharableViewHolder(View itemView) {
             super(itemView);
             this.item = itemView.findViewById(R.id.item);
             this.icon = (ImageView) itemView.findViewById(R.id.icon);
             this.label = (TextView) itemView.findViewById(R.id.label);
+
+            itemView.setOnClickListener(this);
         }
+
+        public SharableViewHolder(View itemView, OnItemClickListener listener) {
+            this(itemView);
+            this.listener = listener;
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (listener != null)
+                listener.onItemClick(v, this.getAdapterPosition());
+        }
+    }
+
+    interface OnShareActionSelect{
+        void onSelect(ShareActionModel model,int position);
     }
 }
