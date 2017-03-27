@@ -50,6 +50,9 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     private Integer headerLayoutID;
     private Integer footerLayoutID;
     private boolean isHorizontal;
+    private boolean showAsList;
+
+    private DisplayType displayType;
 
     private String shareTextContent;
 
@@ -148,6 +151,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
             this.headerLayoutID = args.getInt(Builder.TAG_LAYOUT_HEADER);
             this.footerLayoutID = args.getInt(Builder.TAG_LAYOUT_FOOTER);
             this.isHorizontal = args.getBoolean(Builder.TAG_ORIENTATION_TAG);
+            this.showAsList = args.getBoolean(Builder.TAG_LIST_FORM);
         }
     }
 
@@ -187,8 +191,23 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     }
 
     private void setupAdapter() {
-        this.adapter = new ShareItemsAdapter(getContext(), isHorizontal);
+        displayType = checkDisplayType();
+
+        this.adapter = new ShareItemsAdapter(getContext(), displayType);
         this.adapter.setCallbackListener(this);
+    }
+
+    private DisplayType checkDisplayType() {
+        final DisplayType type;
+
+        if (isHorizontal && !showAsList)
+            type = DisplayType.HORIZONTAL;
+        else if (!isHorizontal && showAsList)
+            type = DisplayType.LIST;
+        else
+            type = DisplayType.DEFAULT;
+
+        return type;
     }
 
     private void setupTitle() {
@@ -215,12 +234,14 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     }
 
     private void checkNumberOfRows() {
-        if (numberOfRows == null || numberOfRows == 0) {
+        if ((numberOfRows == null || numberOfRows == 0) && displayType == DisplayType.DEFAULT) {
             numberOfRows = 4;
 
             if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
                     && isHorizontal)
                 numberOfRows = 2;
+        } else if (displayType == DisplayType.LIST) {
+            numberOfRows = 1;
         }
     }
 
@@ -268,6 +289,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         private static final String TAG_ROWS_NUMBER = "numberOfRows";
         private static final String TAG_ORIENTATION_TAG = "orientation";
         private static final String TAG_TEXT_CONTENT = "simpleTextContent";
+        private static final String TAG_LIST_FORM = "listForm";
 
         private String type;
         private String title;
@@ -275,6 +297,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         private Integer footerLayoutId;
         private Integer numberOfRows;
         private boolean isHorizontal = false;
+        private boolean showAsList = false;
 
         public Builder setType(String type) {
             this.type = type;
@@ -296,13 +319,18 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
             return this;
         }
 
-        public Builder setRowsNumber(Integer numberOfRows) {
+        private Builder setRowsNumber(Integer numberOfRows) {
             this.numberOfRows = numberOfRows;
             return this;
         }
 
         public Builder changeOrientation(boolean isHorizontal) {
             this.isHorizontal = isHorizontal;
+            return this;
+        }
+
+        public Builder showAsList(boolean showAsList) {
+            this.showAsList = showAsList;
             return this;
         }
 
@@ -325,6 +353,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
                 args.putInt(TAG_ROWS_NUMBER, numberOfRows);
 
             args.putBoolean(TAG_ORIENTATION_TAG, isHorizontal);
+            args.putBoolean(TAG_LIST_FORM, showAsList);
 
             return ShareDialog.newInstance(args);
         }

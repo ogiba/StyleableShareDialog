@@ -20,27 +20,48 @@ import ogiba.styleablesharedialog.ShareDialog.Models.ShareActionModel;
  */
 
 public class ShareItemsAdapter extends RecyclerView.Adapter<ShareItemsAdapter.SharableViewHolder>
-        implements OnItemClickListener{
+        implements OnItemClickListener {
 
     private Context context;
     private List<ShareActionModel> items;
-    private boolean isHorizontal;
+    private DisplayType type;
 
     private OnShareActionSelect callback;
 
     public ShareItemsAdapter(Context context, boolean isHorizontal) {
         this.context = context;
-        this.isHorizontal = isHorizontal;
         this.items = new ArrayList<>();
+
+        if(isHorizontal)
+            type = DisplayType.HORIZONTAL;
+        else
+            type = DisplayType.DEFAULT;
+    }
+
+    public ShareItemsAdapter(Context context, DisplayType type) {
+        this.context = context;
+        this.items = new ArrayList<>();
+        this.type = type;
     }
 
     @Override
     public SharableViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        int itemLayout = R.layout.item_share_action;
-        if (isHorizontal)
-            itemLayout = R.layout.item_share_action_horizontal;
+        final int itemLayout;
+
+        switch (type){
+            case HORIZONTAL:
+                itemLayout = R.layout.item_share_action_horizontal;
+                break;
+            case LIST:
+                itemLayout = R.layout.item_share_action_single;
+                break;
+            default:
+                itemLayout = R.layout.item_share_action;
+                break;
+        }
 
         View layout = LayoutInflater.from(context).inflate(itemLayout, parent, false);
+
         return new SharableViewHolder(layout, this);
     }
 
@@ -58,7 +79,7 @@ public class ShareItemsAdapter extends RecyclerView.Adapter<ShareItemsAdapter.Sh
 
     @Override
     public void onItemClick(View v, int position) {
-        if(callback != null)
+        if (callback != null)
             callback.onSelect(items.get(position), position);
     }
 
@@ -100,7 +121,7 @@ public class ShareItemsAdapter extends RecyclerView.Adapter<ShareItemsAdapter.Sh
         }
     }
 
-    interface OnShareActionSelect{
-        void onSelect(ShareActionModel model,int position);
+    interface OnShareActionSelect {
+        void onSelect(ShareActionModel model, int position);
     }
 }
