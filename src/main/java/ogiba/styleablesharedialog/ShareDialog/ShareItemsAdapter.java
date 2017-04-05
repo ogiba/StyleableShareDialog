@@ -14,6 +14,7 @@ import java.util.List;
 
 import ogiba.styleablesharedialog.R;
 import ogiba.styleablesharedialog.ShareDialog.Models.ShareActionModel;
+import ogiba.styleablesharedialog.ShareDialog.Utils.DisplayType;
 
 /**
  * Created by ogiba on 08.02.2017.

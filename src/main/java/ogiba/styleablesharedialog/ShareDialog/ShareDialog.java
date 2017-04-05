@@ -26,6 +26,8 @@ import java.util.List;
 
 import ogiba.styleablesharedialog.R;
 import ogiba.styleablesharedialog.ShareDialog.Models.ShareActionModel;
+import ogiba.styleablesharedialog.ShareDialog.Utils.DisplayType;
+import ogiba.styleablesharedialog.ShareDialog.Utils.SizeType;
 
 /**
  * Created by ogiba on 09.01.2017.
@@ -52,6 +54,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     private boolean isHorizontal;
     private boolean showAsList;
 
+    private SizeType sizeType = SizeType.WINDOWED;
     private DisplayType displayType;
 
     private String shareTextContent;
@@ -102,10 +105,11 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     public void onStart() {
         super.onStart();
         Window window = getDialog().getWindow();
+        Ratio sizeRatio = checkDialogRatioSize();
         if (window != null) {
             Point size = new Point();
             getActivity().getWindowManager().getDefaultDisplay().getSize(size);
-            window.setLayout((int) (size.x * 1.0), (int) (size.y * 0.6));
+            window.setLayout((int) (size.x * sizeRatio.x), (int) (size.y * sizeRatio.y));
             window.setGravity(Gravity.BOTTOM);
         }
     }
@@ -188,6 +192,23 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
 
         if (headerLayoutID == null || headerLayoutID == 0)
             this.titleView = (TextView) layout.findViewById(R.id.title);
+    }
+
+    private Ratio checkDialogRatioSize() {
+        final Ratio ratio;
+        switch (sizeType) {
+            case FILL_WIDTH:
+                ratio = new Ratio(1.0, 0.6);
+                break;
+            case WINDOWED:
+                ratio = new Ratio(0.8, 0.6);
+                break;
+            default:
+                ratio = new Ratio(1.0, 0.6);
+                break;
+        }
+
+        return ratio;
     }
 
     private void setupAdapter() {
@@ -362,6 +383,16 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
             args.putBoolean(TAG_LIST_FORM, showAsList);
 
             return ShareDialog.newInstance(args);
+        }
+    }
+
+    class Ratio {
+        public double x;
+        public double y;
+
+        public Ratio(double x, double y) {
+            this.x = x;
+            this.y = y;
         }
     }
 }
