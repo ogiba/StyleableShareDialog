@@ -234,14 +234,20 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     }
 
     private void checkNumberOfRows() {
-        if ((numberOfRows == null || numberOfRows == 0) && displayType == DisplayType.DEFAULT) {
-            numberOfRows = 4;
+        switch (displayType) {
+            case DEFAULT:
+            case HORIZONTAL:
+                if (numberOfRows == null || numberOfRows == 0) {
+                    numberOfRows = 4;
 
-            if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
-                    && isHorizontal)
-                numberOfRows = 2;
-        } else if (displayType == DisplayType.LIST) {
-            numberOfRows = 1;
+                    if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
+                            && isHorizontal)
+                        numberOfRows = 2;
+                }
+                break;
+            case LIST:
+                numberOfRows = 1;
+                break;
         }
     }
 

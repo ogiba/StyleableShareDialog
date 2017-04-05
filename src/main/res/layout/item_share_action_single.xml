@@ -25,6 +25,8 @@
             android:id="@+id/label"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
             android:gravity="center_vertical"
             android:textSize="@dimen/share_item_size_text_bigger"
             tools:text="Test" />
@@ -33,5 +35,5 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray" />
+        android:background="@color/gray_with_60_alpha" />
 </LinearLayout>
