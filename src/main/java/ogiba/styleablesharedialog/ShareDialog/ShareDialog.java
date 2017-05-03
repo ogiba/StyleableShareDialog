@@ -54,11 +54,17 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     private boolean isHorizontal;
     private boolean showAsList;
 
-    private SizeType sizeType = SizeType.WINDOWED;
+    private SizeType sizeType = SizeType.FILL_WIDTH;
     private DisplayType displayType;
 
     private String shareTextContent;
 
+    /**
+     * Create new instance of {@link ShareDialog} with custom type
+     *
+     * @param shareType - type of shared content in string.
+     * @return currently created instance of {@link ShareDialog}
+     */
     public static ShareDialog newInstance(String shareType) {
         Bundle args = new Bundle();
         args.putString(Builder.TAG_TYPE_TEXT, shareType);
@@ -68,6 +74,11 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         return fragment;
     }
 
+    /**
+     * Create new instance of {@link ShareDialog}
+     *
+     * @return currently created instance of {@link ShareDialog}
+     */
     public static ShareDialog newInstance() {
         Bundle args = new Bundle();
         args.putString(Builder.TAG_TYPE_TEXT, TYPE_TEXT);
@@ -77,6 +88,12 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         return fragment;
     }
 
+    /**
+     * Create instance of {@link ShareDialog} with {@link Bundle}
+     *
+     * @param args {@link Bundle} arguments
+     * @return current instance of {@link ShareDialog}
+     */
     public static ShareDialog newInstance(Bundle args) {
         ShareDialog fragment = new ShareDialog();
         fragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.StyleableDialog);
@@ -84,10 +101,20 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         return fragment;
     }
 
+    /**
+     * Shows currently created instance of {@link ShareDialog}
+     *
+     * @param fragmentManager instance of {@link FragmentManager} used to shows {@link ShareDialog}
+     */
     public void show(FragmentManager fragmentManager) {
         this.show(fragmentManager, SHARE_DIALOG_TAG);
     }
 
+    /**
+     * Shows currenty created instance of {@link ShareDialog} via {@link FragmentTransaction}
+     *
+     * @param fragmentTransaction instance of {@link FragmentTransaction} used to shows {@link ShareDialog}
+     */
     public void show(FragmentTransaction fragmentTransaction) {
         this.show(fragmentTransaction, SHARE_DIALOG_TAG);
     }
@@ -308,6 +335,9 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         this.shareTextContent = shareTextContent;
     }
 
+    /**
+     * {@link Builder} is responsible for setting up parameters of {@link ShareDialog}
+     */
     public static class Builder {
         private static final String TAG_TYPE_TEXT = "text";
         private static final String TAG_TITLE = "title";
@@ -322,7 +352,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         private String title;
         private Integer headerLayoutId;
         private Integer footerLayoutId;
-        private Integer numberOfRows;
+        private Integer numberOfSections;
         private boolean isHorizontal = false;
         private boolean showAsList = false;
 
@@ -346,8 +376,14 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
             return this;
         }
 
-        private Builder setRowsNumber(Integer numberOfRows) {
-            this.numberOfRows = numberOfRows;
+        /**
+         * Not supported in current version
+         *
+         * @param numberOfSections number of elements sections
+         * @return current instance of {@link ShareDialog.Builder}
+         */
+        private Builder setSectionNumber(Integer numberOfSections) {
+            this.numberOfSections = numberOfSections;
             return this;
         }
 
@@ -376,8 +412,8 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
             if (footerLayoutId != null)
                 args.putInt(TAG_LAYOUT_FOOTER, footerLayoutId);
 
-            if (numberOfRows != null)
-                args.putInt(TAG_ROWS_NUMBER, numberOfRows);
+            if (numberOfSections != null && numberOfSections > 0)
+                args.putInt(TAG_ROWS_NUMBER, numberOfSections);
 
             args.putBoolean(TAG_ORIENTATION_TAG, isHorizontal);
             args.putBoolean(TAG_LIST_FORM, showAsList);
@@ -387,10 +423,10 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     }
 
     class Ratio {
-        public double x;
-        public double y;
+        double x;
+        double y;
 
-        public Ratio(double x, double y) {
+        Ratio(double x, double y) {
             this.x = x;
             this.y = y;
         }
