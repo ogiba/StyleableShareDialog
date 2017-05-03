@@ -58,6 +58,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     private DisplayType displayType;
 
     private String shareTextContent;
+    private ArrayList<String> shareTextListContent;
 
     /**
      * Create new instance of {@link ShareDialog} with custom type
@@ -166,6 +167,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(Builder.TAG_TEXT_CONTENT, shareTextContent);
+        outState.putStringArrayList(Builder.TAG_TEXT_LIST_CONTENT, shareTextListContent);
     }
 
     @Override
@@ -307,12 +309,23 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     }
 
     private void shareContent(ShareActionModel model) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
+        String intentAction = Intent.ACTION_SEND;
+
+        if(shareTextListContent != null) {
+            intentAction = Intent.ACTION_SEND_MULTIPLE;
+        }
+
+        Intent intent = new Intent(intentAction);
         if (model.getAppInfo() != null)
             intent.setComponent(new ComponentName(model.getAppInfo().activityInfo.packageName,
                     model.getAppInfo().activityInfo.name));
         intent.setType(shareType);
-        intent.putExtra(Intent.EXTRA_TEXT, shareTextContent);
+
+        if(shareTextListContent != null){
+            intent.putStringArrayListExtra(Intent.EXTRA_STREAM, shareTextListContent);
+        }else {
+            intent.putExtra(Intent.EXTRA_TEXT, shareTextContent);
+        }
         startActivity(intent);
     }
 
@@ -335,6 +348,10 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         this.shareTextContent = shareTextContent;
     }
 
+    public void setShareContent(ArrayList<String> shareListContent){
+        this.shareTextListContent = shareListContent;
+    }
+
     /**
      * {@link Builder} is responsible for setting up parameters of {@link ShareDialog}
      */
@@ -346,6 +363,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         private static final String TAG_ROWS_NUMBER = "numberOfRows";
         private static final String TAG_ORIENTATION_TAG = "orientation";
         private static final String TAG_TEXT_CONTENT = "simpleTextContent";
+        private static final String TAG_TEXT_LIST_CONTENT = "textListContent";
         private static final String TAG_LIST_FORM = "listForm";
 
         private String type;
