@@ -1,6 +1,7 @@
 package ogiba.styleablesharedialog.ShareDialog;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -14,11 +15,14 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -28,6 +32,8 @@ import ogiba.styleablesharedialog.R;
 import ogiba.styleablesharedialog.ShareDialog.Models.ShareActionModel;
 import ogiba.styleablesharedialog.ShareDialog.Utils.DisplayType;
 import ogiba.styleablesharedialog.ShareDialog.Utils.SizeType;
+
+import static android.content.Context.WINDOW_SERVICE;
 
 /**
  * Created by ogiba on 09.01.2017.
@@ -45,6 +51,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
 
     private ArrayList<ShareActionModel> shareActionModels;
     private ShareItemsAdapter adapter;
+    private int screenOrientation;
 
     private String shareType;
     private String dialogTitle;
@@ -127,6 +134,8 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         super.onCreate(savedInstanceState);
         parseExtras();
 
+        checkDeviceOrientation();
+
         if (savedInstanceState != null)
             parseSavedInstance(savedInstanceState);
     }
@@ -192,6 +201,20 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         }
     }
 
+    private void checkDeviceOrientation() {
+        Context context = getContext();
+        try {
+            if (context != null) {
+                if (context.getSystemService(WINDOW_SERVICE) != null) {
+                    Display display = ((WindowManager) getContext().getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+                    screenOrientation = display.getRotation();
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private void parseSavedInstance(Bundle instance) {
         this.shareTextContent = instance.getString(Builder.TAG_TEXT_CONTENT);
     }
@@ -231,7 +254,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         final Ratio ratio;
         switch (sizeType) {
             case FILL_WIDTH:
-                ratio = new Ratio(1.0, 0.6);
+                ratio = fullWidthRadioBehavior();
                 break;
             case WINDOWED:
                 ratio = new Ratio(0.8, 0.6);
@@ -241,6 +264,17 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
                 break;
         }
 
+        return ratio;
+    }
+
+    private Ratio fullWidthRadioBehavior() {
+        final Ratio ratio;
+        if (!isHorizontal || screenOrientation == Surface.ROTATION_90 ||
+                screenOrientation == Surface.ROTATION_270)
+            ratio = new Ratio(1.0, 0.6);
+        else {
+            ratio = new Ratio(1.0, 0.5);
+        }
         return ratio;
     }
 
@@ -296,9 +330,17 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     private void checkNumberOfRows() {
         switch (displayType) {
             case DEFAULT:
-            case HORIZONTAL:
                 if (numberOfRows == null || numberOfRows == 0) {
                     numberOfRows = 4;
+
+                    if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
+                            && isHorizontal)
+                        numberOfRows = 2;
+                }
+                break;
+            case HORIZONTAL:
+                if (numberOfRows == null || numberOfRows == 0) {
+                    numberOfRows = 3;
 
                     if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
                             && isHorizontal)
