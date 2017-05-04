@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/activity_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="ogiba.stylablesharedialog.MainActivity">
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_description" />
+
+        <Button
+            android:id="@+id/simple_share"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/description"
+            android:text="@string/simple_share" />
+
+        <Button
+            android:id="@+id/simple_share_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/simple_share"
+            android:text="@string/simple_share_horizontal" />
+
+        <Button
+            android:id="@+id/simple_share_with_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/simple_share_horizontal"
+            android:text="@string/simple_share_header" />
+
+        <Button
+            android:id="@+id/simple_share_with_footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/simple_share_with_header"
+            android:text="@string/simple_share_footer" />
+
+        <Button
+            android:id="@+id/simple_share_with_both"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/simple_share_with_footer"
+            android:text="@string/simple_share_both" />
+
+        <Button
+            android:id="@+id/simple_share_as_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/simple_share_with_both"
+            android:text="@string/simple_share_list_form" />
+    </RelativeLayout>
+</ScrollView>

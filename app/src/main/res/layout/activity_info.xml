@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ogiba.stylablesharedialog.InfoActivity"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/github_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/github_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:text="Github project"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/github_label"
+            android:layout_marginTop="5dp"
+            android:text="@string/info_activity_github_address" />
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/developer_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+        <TextView
+            android:id="@+id/developer_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="Developer"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/developer_label"
+            android:layout_marginTop="5dp"
+            android:text="@string/info_activity_linkedin_address" />
+    </RelativeLayout>
+</LinearLayout>

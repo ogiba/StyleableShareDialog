@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">StylableShareDialog</string>
+    <string name="app_description">This is simple app that shows how StyleableShareDialog is working. Thanks for downloading and be interesting in my project. :)</string>
+    <string name="simple_share">Show dialog</string>
+    <string name="simple_share_horizontal">Show horizontal scroll dialog</string>
+    <string name="simple_share_header">Show dialog with header</string>
+    <string name="simple_share_footer">Show dialog with footer</string>
+    <string name="simple_share_both">Show dialog with header and footer</string>
+    <string name="simple_share_list_form">Show dialog as list</string>
+    <string name="simple_share_with_fifth_columns">Show dialog with 5 columns</string>
+
+    <string name="dialog_custom_header">Custom header value</string>
+    <string name="dialog_custom_footer">Custom footer value</string>
+
+    <string name="info_activity_title">About</string>
+    <string name="info_activity_github_address">https://github.com/ogiba/StyleableShareDialog</string>
+    <string name="info_activity_linkedin_address">https://www.linkedin.com/in/robert-ogiba-b69766a4/</string>
+
+    <string name="info_menu_item">About</string>
+</resources>
