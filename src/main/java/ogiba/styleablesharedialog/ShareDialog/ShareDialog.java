@@ -48,6 +48,8 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
 
     private String shareType;
     private String dialogTitle;
+    private Integer dialogTitleTintColor;
+    private Integer dialogTitleTintBackground;
     private Integer numberOfRows;
     private Integer headerLayoutID;
     private Integer footerLayoutID;
@@ -112,7 +114,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     }
 
     /**
-     * Shows currenty created instance of {@link ShareDialog} via {@link FragmentTransaction}
+     * Shows currently created instance of {@link ShareDialog} via {@link FragmentTransaction}
      *
      * @param fragmentTransaction instance of {@link FragmentTransaction} used to shows {@link ShareDialog}
      */
@@ -180,6 +182,8 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         if (args != null) {
             this.shareType = args.getString(Builder.TAG_TYPE_TEXT);
             this.dialogTitle = args.getString(Builder.TAG_TITLE);
+            this.dialogTitleTintColor = args.getInt(Builder.TAG_TITLE_TINT);
+            this.dialogTitleTintBackground = args.getInt(Builder.TAG_TITLE_BACKGROUND);
             this.numberOfRows = args.getInt(Builder.TAG_ROWS_NUMBER);
             this.headerLayoutID = args.getInt(Builder.TAG_LAYOUT_HEADER);
             this.footerLayoutID = args.getInt(Builder.TAG_LAYOUT_FOOTER);
@@ -264,6 +268,12 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         if (titleView == null)
             return;
 
+        if (dialogTitleTintColor != null && dialogTitleTintColor != 0)
+            titleView.setTextColor(dialogTitleTintColor);
+
+        if(dialogTitleTintBackground != null)
+            titleView.setBackgroundColor(dialogTitleTintBackground);
+
         if (dialogTitle != null && !dialogTitle.equals(""))
             titleView.setText(dialogTitle);
         else
@@ -311,7 +321,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     private void shareContent(ShareActionModel model) {
         String intentAction = Intent.ACTION_SEND;
 
-        if(shareTextListContent != null) {
+        if (shareTextListContent != null) {
             intentAction = Intent.ACTION_SEND_MULTIPLE;
         }
 
@@ -321,9 +331,9 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
                     model.getAppInfo().activityInfo.name));
         intent.setType(shareType);
 
-        if(shareTextListContent != null){
+        if (shareTextListContent != null) {
             intent.putStringArrayListExtra(Intent.EXTRA_STREAM, shareTextListContent);
-        }else {
+        } else {
             intent.putExtra(Intent.EXTRA_TEXT, shareTextContent);
         }
         startActivity(intent);
@@ -348,7 +358,12 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         this.shareTextContent = shareTextContent;
     }
 
-    public void setShareContent(ArrayList<String> shareListContent){
+    /**
+     * Not supported in current version of {@link ShareDialog}
+     *
+     * @param shareListContent {@link ArrayList} of strings that should be shared
+     */
+    public void setShareContent(ArrayList<String> shareListContent) {
         this.shareTextListContent = shareListContent;
     }
 
@@ -358,6 +373,8 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     public static class Builder {
         private static final String TAG_TYPE_TEXT = "text";
         private static final String TAG_TITLE = "title";
+        private static final String TAG_TITLE_TINT = "titleTintColor";
+        private static final String TAG_TITLE_BACKGROUND = "titleBackgroundColor";
         private static final String TAG_LAYOUT_HEADER = "layoutHeader";
         private static final String TAG_LAYOUT_FOOTER = "layoutFooter";
         private static final String TAG_ROWS_NUMBER = "numberOfRows";
@@ -368,6 +385,8 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
 
         private String type;
         private String title;
+        private Integer titleTintColor;
+        private Integer titleBackgroundColor;
         private Integer headerLayoutId;
         private Integer footerLayoutId;
         private Integer numberOfSections;
@@ -381,6 +400,16 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
 
         public Builder setTitle(String title) {
             this.title = title;
+            return this;
+        }
+
+        public Builder setTitleTintColor(int color) {
+            this.titleTintColor = color;
+            return this;
+        }
+
+        public Builder setTitleBackgroundColor(int color) {
+            this.titleBackgroundColor = color;
             return this;
         }
 
@@ -423,6 +452,12 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
 
             if (title != null)
                 args.putString(TAG_TITLE, title);
+
+            if (titleTintColor != null)
+                args.putInt(TAG_TITLE_TINT, titleTintColor);
+
+            if (titleBackgroundColor != null)
+                args.putInt(TAG_TITLE_BACKGROUND, titleBackgroundColor);
 
             if (headerLayoutId != null)
                 args.putInt(TAG_LAYOUT_HEADER, headerLayoutId);
