@@ -271,7 +271,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         if (dialogTitleTintColor != null && dialogTitleTintColor != 0)
             titleView.setTextColor(dialogTitleTintColor);
 
-        if(dialogTitleTintBackground != null)
+        if (dialogTitleTintBackground != null)
             titleView.setBackgroundColor(dialogTitleTintBackground);
 
         if (dialogTitle != null && !dialogTitle.equals(""))
@@ -393,31 +393,69 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         private boolean isHorizontal = false;
         private boolean showAsList = false;
 
+        /**
+         * Defines what kind of content will be shared via {@link ShareDialog}
+         *
+         * @param type {@link String} value that represent type of sharing content. For example: "text/*"
+         * @return instance of currently created {@link ShareDialog.Builder}
+         */
         public Builder setType(String type) {
             this.type = type;
             return this;
         }
 
+        /**
+         * Allows to specifies title of {@link ShareDialog}. Methods works only for default header.
+         * If custom header is set this method will not make changes on header
+         *
+         * @param title {@link String} value that represent title
+         * @return instance of currently created {@link ShareDialog.Builder}
+         */
         public Builder setTitle(String title) {
             this.title = title;
             return this;
         }
 
+        /**
+         * Allows to set color of default header title
+         *
+         * @param color {@link Integer} value that represents selected color
+         * @return instance of currently created {@link ShareDialog.Builder}
+         */
         public Builder setTitleTintColor(int color) {
             this.titleTintColor = color;
             return this;
         }
 
+        /**
+         * Allows to set background color of default header. This method do not take impact
+         * if custom layout was added.
+         *
+         * @param color {@link Integer} value that represents selected color
+         * @return instance of currently created {@link ShareDialog.Builder}
+         */
         public Builder setTitleBackgroundColor(int color) {
             this.titleBackgroundColor = color;
             return this;
         }
 
+        /**
+         * Sets provided layout as header.
+         *
+         * @param layoutID {@link Integer} value that represent custom layout
+         * @return instance of currently created {@link ShareDialog.Builder}
+         */
         public Builder setHeaderLayout(int layoutID) {
             this.headerLayoutId = layoutID;
             return this;
         }
 
+        /**
+         * Sets provided layout as footer
+         *
+         * @param layoutID {@link Integer} value that represent custom layout
+         * @return instance of currently created {@link ShareDialog.Builder}
+         */
         public Builder setFooterLayout(int layoutID) {
             this.footerLayoutId = layoutID;
             return this;
@@ -434,16 +472,36 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
             return this;
         }
 
+        /**
+         * Provides possibility to change orientation of {@link ShareDialog} {@link RecyclerView}
+         *
+         * @param isHorizontal {@link Boolean} flag that informs library to provide for user
+         *                     {@link ShareDialog} in required orientation. Can be
+         *                     switched between Vertical and Horizontal
+         * @return current instance of {@link ShareDialog.Builder}
+         */
         public Builder changeOrientation(boolean isHorizontal) {
             this.isHorizontal = isHorizontal;
             return this;
         }
 
+        /**
+         * Provides possibility to change items presentation from grid to list
+         *
+         * @param showAsList {@link Boolean} flag that informs library what kind of items styles is
+         *                   required. Can be switched between Grid and List
+         * @return current instance of {@link ShareDialog.Builder}
+         */
         public Builder showAsList(boolean showAsList) {
             this.showAsList = showAsList;
             return this;
         }
 
+        /**
+         * Collects all set properties and build new instance of {@link ShareDialog}
+         *
+         * @return {@link ShareDialog}
+         */
         public ShareDialog build() {
             Bundle args = new Bundle();
 
