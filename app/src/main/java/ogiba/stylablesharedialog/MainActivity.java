@@ -103,8 +103,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void showSimpleShare() {
         ShareDialog.Builder builder = new ShareDialog.Builder();
         builder.setType(ShareDialog.TYPE_TEXT);
-        builder.setSizeRatio(new Ratio(1.0,0.8));
-        builder.setLandscapeRatio(new Ratio(0.5,0.8));
         this.shareDialog = builder.build();
         shareDialog.setShareContent(shareValue);
         shareDialog.show(getSupportFragmentManager());
