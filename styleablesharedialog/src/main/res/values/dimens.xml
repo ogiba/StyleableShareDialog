@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="share_item_size_regular">80dp</dimen>
+    <dimen name="share_item_icon_max_size">30dp</dimen>
+    <dimen name="share_item_size">12sp</dimen>
+    <dimen name="share_item_size_text_bigger">14sp</dimen>
+</resources>

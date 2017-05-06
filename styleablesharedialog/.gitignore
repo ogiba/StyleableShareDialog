@@ -1,5 +1,4 @@
 *.iml
-.github
 .gradle
 /local.properties
 /.idea/workspace.xml
@@ -8,4 +7,4 @@
 /build
 /captures
 .externalNativeBuild
-.bash_profile
+.github
