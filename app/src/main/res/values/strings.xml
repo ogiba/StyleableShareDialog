@@ -13,7 +13,9 @@
     <string name="dialog_custom_footer">Custom footer value</string>
 
     <string name="info_activity_title">About</string>
+    <string name="info_activity_github_label">Github project</string>
     <string name="info_activity_github_address">https://github.com/ogiba/StyleableShareDialog</string>
+    <string name="info_activity_linkedin_label">Developer</string>
     <string name="info_activity_linkedin_address">https://www.linkedin.com/in/robert-ogiba-b69766a4/</string>
 
     <string name="info_menu_item">About</string>

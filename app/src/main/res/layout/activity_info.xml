@@ -62,7 +62,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:text="Github project"
+                android:text="@string/info_activity_github_label"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -102,7 +102,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:text="Developer"
+                android:text="@string/info_activity_linkedin_label"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
