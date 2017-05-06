@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ import java.util.List;
 import ogiba.styleablesharedialog.R;
 import ogiba.styleablesharedialog.ShareDialog.Models.ShareActionModel;
 import ogiba.styleablesharedialog.ShareDialog.Utils.DisplayType;
+import ogiba.styleablesharedialog.ShareDialog.Utils.Ratio;
 import ogiba.styleablesharedialog.ShareDialog.Utils.SizeType;
 
 import static android.content.Context.WINDOW_SERVICE;
@@ -62,6 +64,8 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     private Integer footerLayoutID;
     private boolean isHorizontal;
     private boolean showAsList;
+    private Ratio customDialogRatio;
+    private Ratio customDialogLandscapeRatio;
 
     private SizeType sizeType = SizeType.FILL_WIDTH;
     private DisplayType displayType;
@@ -117,7 +121,11 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
      * @param fragmentManager instance of {@link FragmentManager} used to shows {@link ShareDialog}
      */
     public void show(FragmentManager fragmentManager) {
-        this.show(fragmentManager, SHARE_DIALOG_TAG);
+        if (fragmentManager != null) {
+            this.show(fragmentManager, SHARE_DIALOG_TAG);
+        } else {
+            Log.e("SHARE_DIALOG", "To show ShareDialog, FragmentManger cannot be null.");
+        }
     }
 
     /**
@@ -126,7 +134,10 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
      * @param fragmentTransaction instance of {@link FragmentTransaction} used to shows {@link ShareDialog}
      */
     public void show(FragmentTransaction fragmentTransaction) {
-        this.show(fragmentTransaction, SHARE_DIALOG_TAG);
+        if (fragmentTransaction != null)
+            this.show(fragmentTransaction, SHARE_DIALOG_TAG);
+        else
+            Log.e("SHARE_DIALOG", "To show ShareDialog, FragmentTransaction cannot be null.");
     }
 
     @Override
@@ -148,7 +159,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         if (window != null) {
             Point size = new Point();
             getActivity().getWindowManager().getDefaultDisplay().getSize(size);
-            window.setLayout((int) (size.x * sizeRatio.x), (int) (size.y * sizeRatio.y));
+            window.setLayout((int) (size.x * sizeRatio.getX()), (int) (size.y * sizeRatio.getY()));
             window.setGravity(Gravity.BOTTOM);
         }
     }
@@ -198,6 +209,11 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
             this.footerLayoutID = args.getInt(Builder.TAG_LAYOUT_FOOTER);
             this.isHorizontal = args.getBoolean(Builder.TAG_ORIENTATION_TAG);
             this.showAsList = args.getBoolean(Builder.TAG_LIST_FORM);
+            this.customDialogRatio = args.getParcelable(Builder.TAG_RATIO_SIZE);
+            this.customDialogLandscapeRatio = args.getParcelable(Builder.TAG_LANDSCAPE_RATIO_SIZE);
+
+            if (customDialogRatio != null)
+                sizeType = SizeType.CUSTOM;
         }
     }
 
@@ -254,10 +270,13 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         final Ratio ratio;
         switch (sizeType) {
             case FILL_WIDTH:
-                ratio = fullWidthRadioBehavior();
+                ratio = fullWidthRatioBehavior();
                 break;
             case WINDOWED:
                 ratio = new Ratio(0.8, 0.6);
+                break;
+            case CUSTOM:
+                ratio = customRatioBehavior();
                 break;
             default:
                 ratio = new Ratio(1.0, 0.6);
@@ -267,13 +286,23 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         return ratio;
     }
 
-    private Ratio fullWidthRadioBehavior() {
+    private Ratio fullWidthRatioBehavior() {
         final Ratio ratio;
         if (!isHorizontal || screenOrientation == Surface.ROTATION_90 ||
                 screenOrientation == Surface.ROTATION_270)
             ratio = new Ratio(1.0, 0.6);
         else {
             ratio = new Ratio(1.0, 0.5);
+        }
+        return ratio;
+    }
+
+    private Ratio customRatioBehavior() {
+        final Ratio ratio;
+        if (screenOrientation == Surface.ROTATION_90 || screenOrientation == Surface.ROTATION_270) {
+            ratio = customDialogLandscapeRatio;
+        } else {
+            ratio = customDialogRatio;
         }
         return ratio;
     }
@@ -424,6 +453,8 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         private static final String TAG_TEXT_CONTENT = "simpleTextContent";
         private static final String TAG_TEXT_LIST_CONTENT = "textListContent";
         private static final String TAG_LIST_FORM = "listForm";
+        private static final String TAG_RATIO_SIZE = "ratioSize";
+        private static final String TAG_LANDSCAPE_RATIO_SIZE = "landscapeRatioSize";
 
         private String type;
         private String title;
@@ -434,6 +465,8 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         private Integer numberOfSections;
         private boolean isHorizontal = false;
         private boolean showAsList = false;
+        private Ratio dialogRatio;
+        private Ratio dialogLandscapeRatio;
 
         /**
          * Defines what kind of content will be shared via {@link ShareDialog}
@@ -540,6 +573,29 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         }
 
         /**
+         * Allows to set custom ratio of {@link ShareDialog} using built-in class {@link Ratio}.
+         *
+         * @param dialogRatio instance of class {@link Ratio}
+         * @return current instance of {@link ShareDialog.Builder}
+         */
+        public Builder setSizeRatio(Ratio dialogRatio) {
+            this.dialogRatio = dialogRatio;
+            return this;
+        }
+
+        /**
+         * Allows to set custom ratio for landscape orientation of {@link ShareDialog}. Works only when
+         * custom ratio size is set.
+         *
+         * @param dialogLandscapeRatio instance of class {@link Ratio}
+         * @return current instance of {@link ShareDialog.Builder}
+         */
+        public Builder setLandscapeRatio(Ratio dialogLandscapeRatio) {
+            this.dialogLandscapeRatio = dialogLandscapeRatio;
+            return this;
+        }
+
+        /**
          * Collects all set properties and build new instance of {@link ShareDialog}
          *
          * @return {@link ShareDialog}
@@ -568,20 +624,16 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
             if (numberOfSections != null && numberOfSections > 0)
                 args.putInt(TAG_ROWS_NUMBER, numberOfSections);
 
+            if (dialogRatio != null)
+                args.putParcelable(TAG_RATIO_SIZE, dialogRatio);
+
+            if (dialogLandscapeRatio != null)
+                args.putParcelable(TAG_LANDSCAPE_RATIO_SIZE, dialogLandscapeRatio);
+
             args.putBoolean(TAG_ORIENTATION_TAG, isHorizontal);
             args.putBoolean(TAG_LIST_FORM, showAsList);
 
             return ShareDialog.newInstance(args);
-        }
-    }
-
-    class Ratio {
-        double x;
-        double y;
-
-        Ratio(double x, double y) {
-            this.x = x;
-            this.y = y;
         }
     }
 }

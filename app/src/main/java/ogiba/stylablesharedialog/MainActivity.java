@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 
 import ogiba.styleablesharedialog.ShareDialog.ShareDialog;
+import ogiba.styleablesharedialog.ShareDialog.Utils.Ratio;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -95,6 +96,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void showSimpleShare() {
         ShareDialog.Builder builder = new ShareDialog.Builder();
         builder.setType(ShareDialog.TYPE_TEXT);
+        builder.setSizeRatio(new Ratio(1.0,0.8));
+        builder.setLandscapeRatio(new Ratio(0.5,0.8));
         this.shareDialog = builder.build();
         shareDialog.setShareContent("Test value");
         shareDialog.show(getSupportFragmentManager());

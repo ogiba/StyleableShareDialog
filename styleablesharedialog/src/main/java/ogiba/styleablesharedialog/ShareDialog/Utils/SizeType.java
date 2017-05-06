@@ -6,5 +6,6 @@ package ogiba.styleablesharedialog.ShareDialog.Utils;
 
 public enum SizeType {
     FILL_WIDTH,
-    WINDOWED
+    WINDOWED,
+    CUSTOM
 }
