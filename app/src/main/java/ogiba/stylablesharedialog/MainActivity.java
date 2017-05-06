@@ -9,6 +9,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import ogiba.styleablesharedialog.ShareDialog.ShareDialog;
 import ogiba.styleablesharedialog.ShareDialog.Utils.Ratio;
@@ -23,10 +25,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button simpleShareAsList;
     private ShareDialog shareDialog;
 
+    private String shareValue;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        shareValue = "Test value";
 
         bindViews();
         setupButtons();
@@ -71,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+
         switch (v.getId()) {
             case R.id.simple_share:
                 showSimpleShare();
@@ -99,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setSizeRatio(new Ratio(1.0,0.8));
         builder.setLandscapeRatio(new Ratio(0.5,0.8));
         this.shareDialog = builder.build();
-        shareDialog.setShareContent("Test value");
+        shareDialog.setShareContent(shareValue);
         shareDialog.show(getSupportFragmentManager());
     }
 
@@ -108,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setType(ShareDialog.TYPE_TEXT);
         builder.changeOrientation(true);
         this.shareDialog = builder.build();
-        shareDialog.setShareContent("Test value");
+        shareDialog.setShareContent(shareValue);
         shareDialog.show(getSupportFragmentManager());
     }
 
@@ -117,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setType(ShareDialog.TYPE_TEXT);
         builder.setHeaderLayout(R.layout.dialog_top_container);
         this.shareDialog = builder.build();
-        shareDialog.setShareContent("Test value");
+        shareDialog.setShareContent(shareValue);
         shareDialog.show(getSupportFragmentManager());
     }
 
@@ -126,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setType(ShareDialog.TYPE_TEXT);
         builder.setFooterLayout(R.layout.dialog_bottom_container);
         this.shareDialog = builder.build();
-        shareDialog.setShareContent("Test value");
+        shareDialog.setShareContent(shareValue);
         shareDialog.show(getSupportFragmentManager());
     }
 
@@ -136,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setHeaderLayout(R.layout.dialog_top_container);
         builder.setFooterLayout(R.layout.dialog_bottom_container);
         this.shareDialog = builder.build();
-        shareDialog.setShareContent("Test value");
+        shareDialog.setShareContent(shareValue);
         shareDialog.show(getSupportFragmentManager());
     }
 
@@ -145,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.setType(ShareDialog.TYPE_TEXT);
         builder.showAsList(true);
         this.shareDialog = builder.build();
-        shareDialog.setShareContent("Test value");
+        shareDialog.setShareContent(shareValue);
         shareDialog.show(getSupportFragmentManager());
     }
 
