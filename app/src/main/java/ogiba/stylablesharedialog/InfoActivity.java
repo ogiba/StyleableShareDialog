@@ -2,15 +2,18 @@ package ogiba.stylablesharedialog;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 public class InfoActivity extends AppCompatActivity implements View.OnClickListener {
 
     private View githubRow;
     private View devRow;
+    private TextView demoAppTV;
+    private TextView libraryTV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,11 +24,12 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         setupToolbar();
         bindViews();
         setupViewListeners();
+        loadVersions();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
                 break;
@@ -49,7 +53,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         this.setTitle(R.string.info_activity_title);
     }
 
-    private void setupToolbar(){
+    private void setupToolbar() {
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.getSupportActionBar().setDisplayShowHomeEnabled(true);
         this.getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
@@ -59,6 +63,8 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
     private void bindViews() {
         this.githubRow = this.findViewById(R.id.github_row);
         this.devRow = this.findViewById(R.id.developer_row);
+        this.demoAppTV = (TextView) this.findViewById(R.id.demo_version_tv);
+        this.libraryTV = (TextView) this.findViewById(R.id.library_version_tv);
     }
 
     private void setupViewListeners() {
@@ -66,7 +72,12 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         this.devRow.setOnClickListener(this);
     }
 
-    private void openBrowser(int resAddress){
+    private void loadVersions() {
+        this.demoAppTV.setText(BuildConfig.VERSION_NAME);
+        this.libraryTV.setText(ogiba.styleablesharedialog.BuildConfig.VERSION_NAME);
+    }
+
+    private void openBrowser(int resAddress) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(getResources().getString(resAddress)));
         startActivity(intent);

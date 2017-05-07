@@ -13,6 +13,8 @@
     <string name="dialog_custom_footer">Custom footer value</string>
 
     <string name="info_activity_title">About</string>
+    <string name="info_activity_demo_label">Demo app version</string>
+    <string name="info_activity_library_label">Library version</string>
     <string name="info_activity_github_label">Github project</string>
     <string name="info_activity_github_address">https://github.com/ogiba/StyleableShareDialog</string>
     <string name="info_activity_linkedin_label">Developer</string>
