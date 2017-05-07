@@ -1,7 +1,7 @@
 # StyleableShareDialog
 
 [![](https://jitpack.io/v/ogiba/StyleableShareDialog.svg)](https://jitpack.io/#ogiba/StyleableShareDialog)
-[![GitHub license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/ogiba/StyleableShareDialog/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/ogiba/StyleableShareDialog/blob/master/LICENSE)
 
 
 Open source library that allows to quickly create ShareDialog with some customization.
