@@ -2,11 +2,22 @@
 
 [![](https://jitpack.io/v/ogiba/StyleableShareDialog.svg)](https://jitpack.io/#ogiba/StyleableShareDialog)
 [![GitHub license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/ogiba/StyleableShareDialog/blob/master/LICENSE)
-
+[![Android](https://img.shields.io/badge/platform-android-green.svg)](https://developer.android.com/index.html)
 
 Open source library that allows to quickly create ShareDialog with some customization.
 
 Library is still in development, current stable version is 0.1.0 .
+
+---
+
+# Sample Project
+
+Sample project is available in Google Play:
+
+<a href="https://play.google.com/store/apps/details?id=ogiba.stylablesharedialog" target="_blank">
+  <img alt="Get it on Google Play"
+       src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" height="60"/>
+</a>
 
 ---
 
@@ -46,7 +57,9 @@ Check project's Releases page to find what was changed according to previous ver
 
 ---
 
-# Basic usage
+# Usage
+
+## Basic
 
 Creating simple share dialog provided by this library, which allows you to share string values is very easy. You just need to create new instance of ShareDialog, give him a value and show it using FragmentManager or FragmentTransaction.
 
@@ -58,7 +71,7 @@ new ShareDialog.newInstance().
 
 ---
 
-# Creating ShareDialog via Builder
+## Creating ShareDialog via Builder
 
 You can easily set more complex properties for ShareDialog instance. To achieve it you need to use Builder mechanism implemented in library. Builder allows you to set diffrenet kind of properites for dialog (e.g. `title`, `titleColorRes`, `customHeaderRes` and `dialogRatioSize`)
 
@@ -72,6 +85,12 @@ new ShareDialog.Builder()
         .setShareContent("Some string value")
         .show(getFragmentManager())
 ```
+
+---
+
+#License
+
+StyleableShareDialog is available under the Apache 2.0 license. See the [LICENSE](https://github.com/ogiba/StyleableShareDialog/blob/master/LICENSE) file for more info. 
 
 ---
 
