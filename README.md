@@ -69,8 +69,6 @@ new ShareDialog.newInstance().
         .show(getFragmentManager());
 ```
 
----
-
 ## Creating ShareDialog via Builder
 
 You can easily set more complex properties for ShareDialog instance. To achieve it you need to use Builder mechanism implemented in library. Builder allows you to set diffrenet kind of properites for dialog (e.g. `title`, `titleColorRes`, `customHeaderRes` and `dialogRatioSize`)
@@ -88,7 +86,7 @@ new ShareDialog.Builder()
 
 ---
 
-#License
+# License
 
 StyleableShareDialog is available under the Apache 2.0 license. See the [LICENSE](https://github.com/ogiba/StyleableShareDialog/blob/master/LICENSE) file for more info. 
 
