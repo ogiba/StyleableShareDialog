@@ -8,6 +8,7 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -201,9 +202,9 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         Bundle args = getArguments();
         if (args != null) {
             this.shareType = args.getString(Builder.TAG_TYPE_TEXT);
-            this.dialogTitle = args.getString(Builder.TAG_TITLE);
-            this.dialogTitleTintColor = args.getInt(Builder.TAG_TITLE_TINT);
-            this.dialogTitleTintBackground = args.getInt(Builder.TAG_TITLE_BACKGROUND);
+            this.parseTitle(args);
+            this.dialogTitleTintColor =  parseColor(args, Builder.TAG_TITLE_TINT);
+            this.dialogTitleTintBackground = parseColor(args, Builder.TAG_TITLE_BACKGROUND);//args.getInt(Builder.TAG_TITLE_BACKGROUND);
             this.numberOfRows = args.getInt(Builder.TAG_ROWS_NUMBER);
             this.headerLayoutID = args.getInt(Builder.TAG_LAYOUT_HEADER);
             this.footerLayoutID = args.getInt(Builder.TAG_LAYOUT_FOOTER);
@@ -214,6 +215,26 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
 
             if (customDialogRatio != null)
                 sizeType = SizeType.CUSTOM;
+        }
+    }
+
+    private void parseTitle(Bundle args) {
+        int titleRes = args.getInt(Builder.TAG_TITLE_RES);
+
+        if (titleRes != 0) {
+            dialogTitle = getResources().getString(titleRes);
+        } else {
+            dialogTitle = args.getString(Builder.TAG_TITLE);
+        }
+    }
+
+    private int parseColor(Bundle args, String tag) {
+        int tintColor = args.getInt(tag);
+
+        try {
+            return getResources().getColor(tintColor);
+        }catch (Exception ex){
+            return tintColor;
         }
     }
 
@@ -444,6 +465,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     public static class Builder {
         private static final String TAG_TYPE_TEXT = "text";
         private static final String TAG_TITLE = "title";
+        private static final String TAG_TITLE_RES = "titleFromResources";
         private static final String TAG_TITLE_TINT = "titleTintColor";
         private static final String TAG_TITLE_BACKGROUND = "titleBackgroundColor";
         private static final String TAG_LAYOUT_HEADER = "layoutHeader";
@@ -458,6 +480,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
 
         private String type;
         private String title;
+        private Integer titleRes;
         private Integer titleTintColor;
         private Integer titleBackgroundColor;
         private Integer headerLayoutId;
@@ -492,6 +515,18 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         }
 
         /**
+         * Allows to specifies title of {@link ShareDialog}. Methods works only for default header.
+         * If custom header is set this method will not make changes on header
+         *
+         * @param resID {@code int} value that represent string title from resource file
+         * @return instance of currently created {@link ShareDialog.Builder}
+         */
+        public Builder setTitle(int resID) {
+            this.titleRes = resID;
+            return this;
+        }
+
+        /**
          * Allows to set color of default header title
          *
          * @param color {@link Integer} value that represents selected color
@@ -508,8 +543,24 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
          *
          * @param color {@link Integer} value that represents selected color
          * @return instance of currently created {@link ShareDialog.Builder}
+         *
+         * @deprecated use {@link #setHeaderBackgroundColor(int)} instead.
          */
+        @Deprecated
         public Builder setTitleBackgroundColor(int color) {
+            this.titleBackgroundColor = color;
+            return this;
+        }
+
+        /**
+         * Allows to set background color of default header. This method do not take impact
+         * if custom layout was added.
+         *
+         * @param color {@link Integer} value that represents selected color
+         * @return instance of currently created {@link ShareDialog.Builder}
+         *
+         */
+        public Builder setHeaderBackgroundColor(int color) {
             this.titleBackgroundColor = color;
             return this;
         }
@@ -608,6 +659,9 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
 
             if (title != null)
                 args.putString(TAG_TITLE, title);
+
+            if(titleRes != null)
+                args.putInt(TAG_TITLE_RES, titleRes);
 
             if (titleTintColor != null)
                 args.putInt(TAG_TITLE_TINT, titleTintColor);
