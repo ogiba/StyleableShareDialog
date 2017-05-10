@@ -9,3 +9,4 @@
 /captures
 .externalNativeBuild
 .bash_profile
+*.jks
