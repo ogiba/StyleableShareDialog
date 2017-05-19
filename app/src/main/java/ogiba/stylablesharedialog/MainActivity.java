@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import ogiba.styleablesharedialog.ShareDialog.ShareDialog;
 import ogiba.styleablesharedialog.ShareDialog.Utils.Ratio;
 
@@ -103,8 +105,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void showSimpleShare() {
         ShareDialog.Builder builder = new ShareDialog.Builder();
         builder.setType(ShareDialog.TYPE_TEXT);
+        builder.setShareContent(shareValue);
         this.shareDialog = builder.build();
-        shareDialog.setShareContent(shareValue);
         shareDialog.show(getSupportFragmentManager());
     }
 
