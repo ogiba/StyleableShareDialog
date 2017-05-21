@@ -27,7 +27,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -208,7 +207,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
             this.shareType = args.getString(Builder.TAG_TYPE);
             this.parseTitle(args);
             this.dialogTitleTintColor = parseColor(args, Builder.TAG_TITLE_TINT);
-            this.dialogTitleTintBackground = parseColor(args, Builder.TAG_TITLE_BACKGROUND);//args.getInt(Builder.TAG_TITLE_BACKGROUND);
+            this.dialogTitleTintBackground = parseColor(args, Builder.TAG_TITLE_BACKGROUND);
             this.numberOfRows = args.getInt(Builder.TAG_ROWS_NUMBER);
             this.headerLayoutID = args.getInt(Builder.TAG_LAYOUT_HEADER);
             this.footerLayoutID = args.getInt(Builder.TAG_LAYOUT_FOOTER);
@@ -463,9 +462,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
                 intent.putExtra(Intent.EXTRA_TEXT, contentToShare);
                 startActivity(intent);
                 break;
-            case TYPE_IMAGE:
-            case TYPE_IMAGE_JPEG:
-            case TYPE_IMAGE_PNG:
+            default:
                 if (shareListContent != null && shareListContent.size() > 0) {
                     intentAction = Intent.ACTION_SEND_MULTIPLE;
                     final ArrayList<Uri> uriValues = parseStringsToUri(shareListContent);

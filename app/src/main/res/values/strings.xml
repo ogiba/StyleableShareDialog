@@ -7,6 +7,7 @@
     <string name="simple_share_footer">Show dialog with footer</string>
     <string name="simple_share_both">Show dialog with header and footer</string>
     <string name="simple_share_list_form">Show dialog as list</string>
+    <string name="simple_share_image">Show dialog to share image file</string>
     <string name="simple_share_with_fifth_columns">Show dialog with 5 columns</string>
 
     <string name="dialog_custom_header">Custom header value</string>
