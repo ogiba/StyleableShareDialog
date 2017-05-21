@@ -6,7 +6,7 @@
 
 Open source library that allows to quickly create ShareDialog with some customization.
 
-Library is still in development, current stable version is 0.1.0 .
+Library is still in development, current stable version is 0.2.0 .
 
 ---
 
@@ -42,7 +42,7 @@ And as next step add dependency to project:
 
 ```gradle
 dependencies {
-    compile 'com.github.ogiba:StyleableShareDialog:v0.1.0'
+    compile 'com.github.ogiba:StyleableShareDialog:v0.2.0'
 }
 ```
 
@@ -79,8 +79,8 @@ new ShareDialog.Builder()
         .setTitleTintColor(Color.Red)
         .setHeaderLayout(R.layout.customHeader)
         .setSizeRatio(new Ratio(1.0,0.5))
-        .build()
         .setShareContent("Some string value")
+        .build()
         .show(getFragmentManager())
 ```
 
