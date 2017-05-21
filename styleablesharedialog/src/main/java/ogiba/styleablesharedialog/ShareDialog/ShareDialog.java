@@ -7,8 +7,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Debug;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -44,6 +44,9 @@ import static android.content.Context.WINDOW_SERVICE;
 
 public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnShareActionSelect {
     public static final String TYPE_TEXT = "text/*";
+    public static final String TYPE_IMAGE = "image/*";
+    public static final String TYPE_IMAGE_JPEG = "image/jpeg";
+    public static final String TYPE_IMAGE_PNG = "image/png";
     private static final String SHARE_DIALOG_TAG = "ShareDialog";
 
     private RecyclerView sharableAppList;
@@ -72,7 +75,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     private DisplayType displayType;
 
     private String shareTextContent;
-    private ArrayList<String> shareTextListContent;
+    private ArrayList<String> shareListContent;
 
     /**
      * Create new instance of {@link ShareDialog} with custom type
@@ -82,7 +85,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
      */
     public static ShareDialog newInstance(String shareType) {
         Bundle args = new Bundle();
-        args.putString(Builder.TAG_TYPE_TEXT, shareType);
+        args.putString(Builder.TAG_TYPE, shareType);
         ShareDialog fragment = new ShareDialog();
         fragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.StyleableDialog);
         fragment.setArguments(args);
@@ -96,7 +99,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
      */
     public static ShareDialog newInstance() {
         Bundle args = new Bundle();
-        args.putString(Builder.TAG_TYPE_TEXT, TYPE_TEXT);
+        args.putString(Builder.TAG_TYPE, TYPE_TEXT);
         ShareDialog fragment = new ShareDialog();
         fragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.StyleableDialog);
         fragment.setArguments(args);
@@ -190,7 +193,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(Builder.TAG_TEXT_CONTENT, shareTextContent);
-        outState.putStringArrayList(Builder.TAG_TEXT_LIST_CONTENT, shareTextListContent);
+        outState.putStringArrayList(Builder.TAG_LIST_CONTENT, shareListContent);
     }
 
     @Override
@@ -201,10 +204,10 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     private void parseExtras() {
         Bundle args = getArguments();
         if (args != null) {
-            this.shareType = args.getString(Builder.TAG_TYPE_TEXT);
+            this.shareType = args.getString(Builder.TAG_TYPE);
             this.parseTitle(args);
-            this.dialogTitleTintColor =  parseColor(args, Builder.TAG_TITLE_TINT);
-            this.dialogTitleTintBackground = parseColor(args, Builder.TAG_TITLE_BACKGROUND);//args.getInt(Builder.TAG_TITLE_BACKGROUND);
+            this.dialogTitleTintColor = parseColor(args, Builder.TAG_TITLE_TINT);
+            this.dialogTitleTintBackground = parseColor(args, Builder.TAG_TITLE_BACKGROUND);
             this.numberOfRows = args.getInt(Builder.TAG_ROWS_NUMBER);
             this.headerLayoutID = args.getInt(Builder.TAG_LAYOUT_HEADER);
             this.footerLayoutID = args.getInt(Builder.TAG_LAYOUT_FOOTER);
@@ -212,6 +215,9 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
             this.showAsList = args.getBoolean(Builder.TAG_LIST_FORM);
             this.customDialogRatio = args.getParcelable(Builder.TAG_RATIO_SIZE);
             this.customDialogLandscapeRatio = args.getParcelable(Builder.TAG_LANDSCAPE_RATIO_SIZE);
+
+            this.parseShareTextContent(args);
+            this.parseShareListContent(args);
 
             if (customDialogRatio != null)
                 sizeType = SizeType.CUSTOM;
@@ -233,9 +239,19 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
 
         try {
             return getResources().getColor(tintColor);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             return tintColor;
         }
+    }
+
+    private void parseShareTextContent(Bundle args) {
+        if (shareTextContent == null)
+            shareTextContent = args.getString(Builder.TAG_TEXT_CONTENT);
+    }
+
+    private void parseShareListContent(Bundle args) {
+        if (shareListContent == null)
+            shareListContent = args.getStringArrayList(Builder.TAG_LIST_CONTENT);
     }
 
     private void checkDeviceOrientation() {
@@ -413,7 +429,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
     private void shareContent(ShareActionModel model) {
         String intentAction = Intent.ACTION_SEND;
 
-        if (shareTextListContent != null) {
+        if (shareListContent != null) {
             intentAction = Intent.ACTION_SEND_MULTIPLE;
         }
 
@@ -423,12 +439,53 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
                     model.getAppInfo().activityInfo.name));
         intent.setType(shareType);
 
-        if (shareTextListContent != null) {
-            intent.putStringArrayListExtra(Intent.EXTRA_STREAM, shareTextListContent);
-        } else {
-            intent.putExtra(Intent.EXTRA_TEXT, shareTextContent);
+        this.checkShareContentType(model, intent);
+    }
+
+    private void checkShareContentType(ShareActionModel model, Intent intent) {
+        String intentAction = Intent.ACTION_SEND;
+
+        switch (shareType) {
+            case TYPE_TEXT:
+                final String contentToShare;
+                if (shareListContent != null && shareListContent.size() > 1) {
+                    StringBuilder builder = new StringBuilder();
+                    for (String content : shareListContent) {
+                        builder.append(content);
+                        builder.append(System.getProperty("line.separator"));
+                    }
+                    contentToShare = builder.toString();
+                } else {
+                    contentToShare = shareTextContent;
+                }
+                intent.setAction(intentAction);
+                intent.putExtra(Intent.EXTRA_TEXT, contentToShare);
+                startActivity(intent);
+                break;
+            default:
+                if (shareListContent != null && shareListContent.size() > 0) {
+                    intentAction = Intent.ACTION_SEND_MULTIPLE;
+                    final ArrayList<Uri> uriValues = parseStringsToUri(shareListContent);
+                    intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriValues);
+                    intent.setAction(intentAction);
+                } else {
+                    Uri fileUri = Uri.parse(shareTextContent);
+                    intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                    intent.setAction(intentAction);
+                }
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(intent);
+                break;
         }
-        startActivity(intent);
+    }
+
+    private ArrayList<Uri> parseStringsToUri(ArrayList<String> values) {
+        ArrayList<Uri> uris = new ArrayList<>();
+        for (String fileAddress : values) {
+            Uri uri = Uri.parse(fileAddress);
+            uris.add(uri);
+        }
+        return uris;
     }
 
     protected ArrayList<ShareActionModel> getSharableApps() {
@@ -446,24 +503,29 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         return shareActionModels;
     }
 
+    /**
+     * Allows to set content that will be shared using created instance of {@link ShareDialog}
+     *
+     * @param shareTextContent {@link String} value that will be shared
+     */
     public void setShareContent(String shareTextContent) {
         this.shareTextContent = shareTextContent;
     }
 
     /**
-     * Not supported in current version of {@link ShareDialog}
+     * Allows to set list of contents that will be shared using created instance of {@link ShareDialog}
      *
-     * @param shareListContent {@link ArrayList} of strings that should be shared
+     * @param shareListContent {@link ArrayList<String>} that contains values to share
      */
     public void setShareContent(ArrayList<String> shareListContent) {
-        this.shareTextListContent = shareListContent;
+        this.shareListContent = shareListContent;
     }
 
     /**
      * {@link Builder} is responsible for setting up parameters of {@link ShareDialog}
      */
     public static class Builder {
-        private static final String TAG_TYPE_TEXT = "text";
+        private static final String TAG_TYPE = "type";
         private static final String TAG_TITLE = "title";
         private static final String TAG_TITLE_RES = "titleFromResources";
         private static final String TAG_TITLE_TINT = "titleTintColor";
@@ -473,12 +535,13 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         private static final String TAG_ROWS_NUMBER = "numberOfRows";
         private static final String TAG_ORIENTATION_TAG = "orientation";
         private static final String TAG_TEXT_CONTENT = "simpleTextContent";
-        private static final String TAG_TEXT_LIST_CONTENT = "textListContent";
+        private static final String TAG_LIST_CONTENT = "listContent";
         private static final String TAG_LIST_FORM = "listForm";
         private static final String TAG_RATIO_SIZE = "ratioSize";
         private static final String TAG_LANDSCAPE_RATIO_SIZE = "landscapeRatioSize";
 
-        private String type;
+        private String type = TYPE_TEXT;
+        private String shareTextValue;
         private String title;
         private Integer titleRes;
         private Integer titleTintColor;
@@ -488,6 +551,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         private Integer numberOfSections;
         private boolean isHorizontal = false;
         private boolean showAsList = false;
+        private ArrayList<String> shareValues;
         private Ratio dialogRatio;
         private Ratio dialogLandscapeRatio;
 
@@ -543,7 +607,6 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
          *
          * @param color {@link Integer} value that represents selected color
          * @return instance of currently created {@link ShareDialog.Builder}
-         *
          * @deprecated use {@link #setHeaderBackgroundColor(int)} instead.
          */
         @Deprecated
@@ -558,7 +621,6 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
          *
          * @param color {@link Integer} value that represents selected color
          * @return instance of currently created {@link ShareDialog.Builder}
-         *
          */
         public Builder setHeaderBackgroundColor(int color) {
             this.titleBackgroundColor = color;
@@ -647,6 +709,30 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         }
 
         /**
+         * Allows to set content that will be shared via {@link ShareDialog}. If method with the same name
+         * from {@link ShareDialog} will be used this value will be replaced
+         *
+         * @param value {@link String} value that should be shared
+         * @return current instance of {@link ShareDialog.Builder}
+         */
+        public Builder setShareContent(String value) {
+            this.shareTextValue = value;
+            return this;
+        }
+
+        /**
+         * Allows to set list of contents that will be shared via {@link ShareDialog}. If method with the same name
+         * from {@link ShareDialog} will be used this value will be replaced
+         *
+         * @param values {@link ArrayList<String>} value that should be shared
+         * @return current instance of {@link ShareDialog.Builder}
+         */
+        public Builder setShareContent(ArrayList<String> values) {
+            this.shareValues = values;
+            return this;
+        }
+
+        /**
          * Collects all set properties and build new instance of {@link ShareDialog}
          *
          * @return {@link ShareDialog}
@@ -655,12 +741,12 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
             Bundle args = new Bundle();
 
             if (type != null)
-                args.putString(TAG_TYPE_TEXT, TYPE_TEXT);
+                args.putString(TAG_TYPE, type);
 
             if (title != null)
                 args.putString(TAG_TITLE, title);
 
-            if(titleRes != null)
+            if (titleRes != null)
                 args.putInt(TAG_TITLE_RES, titleRes);
 
             if (titleTintColor != null)
@@ -683,6 +769,12 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
 
             if (dialogLandscapeRatio != null)
                 args.putParcelable(TAG_LANDSCAPE_RATIO_SIZE, dialogLandscapeRatio);
+
+            if (shareTextValue != null)
+                args.putString(TAG_TEXT_CONTENT, shareTextValue);
+
+            if (shareValues != null)
+                args.putStringArrayList(TAG_LIST_CONTENT, shareValues);
 
             args.putBoolean(TAG_ORIENTATION_TAG, isHorizontal);
             args.putBoolean(TAG_LIST_FORM, showAsList);

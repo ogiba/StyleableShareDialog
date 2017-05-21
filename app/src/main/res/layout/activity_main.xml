@@ -55,5 +55,13 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/simple_share_with_both"
                 android:text="@string/simple_share_list_form" />
+
+            <Button
+                android:id="@+id/simple_share_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/simple_share_as_list"
+                android:text="@string/simple_share_image"
+                android:enabled="false"/>
         </RelativeLayout>
 </ScrollView>

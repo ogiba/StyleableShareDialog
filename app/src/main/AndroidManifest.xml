@@ -23,5 +23,15 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="5a0867218edd690b2cdb651f4600eaadac00898a" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="ogiba.stylablesharedialog.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/fileprovider" />
+        </provider>
     </application>
 </manifest>
