@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">StyleableShareDialog</string>
+    <string name="app_name">Styleable Share Dialog</string>
     <string name="app_description">This is simple app that shows how StyleableShareDialog is working. Thanks for downloading and be interesting in my project. :)</string>
     <string name="simple_share">Show dialog</string>
     <string name="simple_share_horizontal">Show horizontal scroll dialog</string>
