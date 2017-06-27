@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ogiba.styleablesharedialog.R;
+import ogiba.styleablesharedialog.ShareDialog.Core.ShareCore;
 import ogiba.styleablesharedialog.ShareDialog.Models.ShareActionModel;
 import ogiba.styleablesharedialog.ShareDialog.Utils.DisplayType;
 import ogiba.styleablesharedialog.ShareDialog.Utils.Ratio;
@@ -42,7 +43,7 @@ import static android.content.Context.WINDOW_SERVICE;
  * Created by ogiba on 09.01.2017.
  */
 
-public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnShareActionSelect {
+public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnShareActionSelect, ShareCore.ShareListener {
     public static final String TYPE_TEXT = "text/*";
     public static final String TYPE_IMAGE = "image/*";
     public static final String TYPE_IMAGE_JPEG = "image/jpeg";
@@ -76,6 +77,8 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
 
     private String shareTextContent;
     private ArrayList<String> shareListContent;
+
+    private ShareCore shareCore;
 
     /**
      * Create new instance of {@link ShareDialog} with custom type
@@ -149,6 +152,13 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         super.onCreate(savedInstanceState);
         parseExtras();
 
+        shareCore = new ShareCore(getContext(), shareType, this);
+
+        if (shareTextContent != null) {
+            shareCore.setShareContent(shareTextContent);
+        } else if (shareListContent != null)
+            shareCore.setShareContent(shareListContent);
+
         checkDeviceOrientation();
 
         if (savedInstanceState != null)
@@ -183,10 +193,11 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        shareActionModels = getSharableApps();
+        shareActionModels = shareCore.getShareableApps();
 
-        if (shareActionModels.size() > 0)
+        if (shareActionModels != null && shareActionModels.size() > 0) {
             adapter.setItems(shareActionModels);
+        }
     }
 
     @Override
@@ -198,7 +209,37 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
 
     @Override
     public void onSelect(ShareActionModel model, int position) {
-        shareContent(model);
+        shareCore.shareContent(model);
+    }
+
+    @Override
+    public void onShareText(ShareActionModel model, String contentToShare, String intentAction) {
+        Intent intent = new Intent(intentAction);
+        if (model.getAppInfo() != null)
+            intent.setComponent(new ComponentName(model.getAppInfo().activityInfo.packageName,
+                    model.getAppInfo().activityInfo.name));
+        intent.setType(shareCore.getShareType());
+        intent.putExtra(Intent.EXTRA_TEXT, contentToShare);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onShareFile(ShareActionModel model, ArrayList<Uri> contentToShare, String intentAction) {
+        Intent intent = new Intent(intentAction);
+
+        if (model.getAppInfo() != null)
+            intent.setComponent(new ComponentName(model.getAppInfo().activityInfo.packageName,
+                    model.getAppInfo().activityInfo.name));
+
+        intent.setType(shareCore.getShareType());
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        if (contentToShare.size() > 1)
+            intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, contentToShare);
+        else
+            intent.putExtra(Intent.EXTRA_STREAM, contentToShare.get(0));
+
+        startActivity(intent);
     }
 
     private void parseExtras() {
@@ -272,12 +313,12 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         this.shareTextContent = instance.getString(Builder.TAG_TEXT_CONTENT);
     }
 
-    private void attachCustomLayoutToView() {
+    protected void attachCustomLayoutToView() {
         attachCustomHeader();
         attachCustomFooter();
     }
 
-    private void attachCustomHeader() {
+    protected void attachCustomHeader() {
         if (headerLayoutID == null || headerLayoutID == 0)
             return;
 
@@ -285,7 +326,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         LayoutInflater.from(getContext()).inflate(headerLayoutID, headerContainer);
     }
 
-    private void attachCustomFooter() {
+    protected void attachCustomFooter() {
         if (footerLayoutID == null || footerLayoutID == 0)
             return;
 
@@ -426,68 +467,11 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
             return LinearLayoutManager.VERTICAL;
     }
 
-    private void shareContent(ShareActionModel model) {
-        String intentAction = Intent.ACTION_SEND;
-
-        if (shareListContent != null) {
-            intentAction = Intent.ACTION_SEND_MULTIPLE;
-        }
-
-        Intent intent = new Intent(intentAction);
-        if (model.getAppInfo() != null)
-            intent.setComponent(new ComponentName(model.getAppInfo().activityInfo.packageName,
-                    model.getAppInfo().activityInfo.name));
-        intent.setType(shareType);
-
-        this.checkShareContentType(model, intent);
-    }
-
-    private void checkShareContentType(ShareActionModel model, Intent intent) {
-        String intentAction = Intent.ACTION_SEND;
-
-        switch (shareType) {
-            case TYPE_TEXT:
-                final String contentToShare;
-                if (shareListContent != null && shareListContent.size() > 1) {
-                    StringBuilder builder = new StringBuilder();
-                    for (String content : shareListContent) {
-                        builder.append(content);
-                        builder.append(System.getProperty("line.separator"));
-                    }
-                    contentToShare = builder.toString();
-                } else {
-                    contentToShare = shareTextContent;
-                }
-                intent.setAction(intentAction);
-                intent.putExtra(Intent.EXTRA_TEXT, contentToShare);
-                startActivity(intent);
-                break;
-            default:
-                if (shareListContent != null && shareListContent.size() > 0) {
-                    intentAction = Intent.ACTION_SEND_MULTIPLE;
-                    final ArrayList<Uri> uriValues = parseStringsToUri(shareListContent);
-                    intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriValues);
-                    intent.setAction(intentAction);
-                } else {
-                    Uri fileUri = Uri.parse(shareTextContent);
-                    intent.putExtra(Intent.EXTRA_STREAM, fileUri);
-                    intent.setAction(intentAction);
-                }
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivity(intent);
-                break;
-        }
-    }
-
-    private ArrayList<Uri> parseStringsToUri(ArrayList<String> values) {
-        ArrayList<Uri> uris = new ArrayList<>();
-        for (String fileAddress : values) {
-            Uri uri = Uri.parse(fileAddress);
-            uris.add(uri);
-        }
-        return uris;
-    }
-
+    /**
+     * @return {@link ArrayList<ShareActionModel>}
+     * @deprecated method moved to {@link ShareCore} class
+     */
+    @Deprecated
     protected ArrayList<ShareActionModel> getSharableApps() {
         PackageManager pm = getActivity().getPackageManager();
         Intent intent = new Intent(Intent.ACTION_SEND);
