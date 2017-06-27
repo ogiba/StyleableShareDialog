@@ -14,6 +14,8 @@ import ogiba.styleablesharedialog.ShareDialog.Models.ShareActionModel;
 
 /**
  * Created by ogiba on 27.06.2017.
+ * <p>
+ * Core of StyleableShareDialog library
  */
 
 public class ShareCore {
@@ -28,30 +30,64 @@ public class ShareCore {
 
     private String shareType;
 
-    private String shareTextContent;
+    private String shareContent;
     private ArrayList<String> shareListContent;
 
+    /**
+     * Base constructor of {@link ShareCore}
+     *
+     * @param context current instance of {@link Context} required to proper work of ShareCore
+     */
     public ShareCore(Context context) {
         this.context = context;
+        this.shareType = TYPE_TEXT;
     }
 
+    /**
+     * Extended base constructor of {@link ShareCore}. Additionally allows to set {@link ShareListener}
+     * that is used to provide information about shared content
+     *
+     * @param context  current instance of {@link Context} required to proper work of ShareCore
+     * @param callback pointer to class that implements {@link ShareListener} interface
+     */
     public ShareCore(Context context, ShareListener callback) {
         this.context = context;
         this.callback = callback;
         this.shareType = TYPE_TEXT;
     }
 
+    /**
+     * Extended base constructor of {@link ShareCore}. Additionally allows to set {@link String} value
+     * that represents type of sharing contents.
+     *
+     * @param context   current instance of {@link Context} required to proper work of ShareCore
+     * @param shareType {@link String} value that represents current sharing content.
+     */
     public ShareCore(Context context, String shareType) {
         this.context = context;
         this.shareType = shareType;
     }
 
+    /**
+     * Extended base constructor of {@link ShareCore}. Additionally allows to set {@link String} value
+     * that represents type of sharing content and pointer to {@link ShareListener} to provide
+     * information about shared content
+     *
+     * @param context   current instance of {@link Context} required to proper work of ShareCore
+     * @param shareType {@link String} value that represents current sharing content.
+     * @param callback  pointer to class that implements {@link ShareListener} interface
+     */
     public ShareCore(Context context, String shareType, ShareListener callback) {
         this.context = context;
         this.shareType = shareType;
         this.callback = callback;
     }
 
+    /**
+     * Provide information about applications that allows to receive content with current share type
+     *
+     * @return {@link ArrayList<ShareActionModel>}
+     */
     @Nullable
     public ArrayList<ShareActionModel> getShareableApps() {
         if (context == null)
@@ -71,18 +107,17 @@ public class ShareCore {
         return shareActionModels;
     }
 
+    /**
+     * Share provided content to selected {@link ShareActionModel}
+     *
+     * @param model selected {@link ShareActionModel} where content should be shared
+     */
     public void shareContent(ShareActionModel model) {
         String intentAction = Intent.ACTION_SEND;
 
         if (shareListContent != null) {
             intentAction = Intent.ACTION_SEND_MULTIPLE;
         }
-
- /*       Intent intent = new Intent(intentAction);
-        if (model.getAppInfo() != null)
-            intent.setComponent(new ComponentName(model.getAppInfo().activityInfo.packageName,
-                    model.getAppInfo().activityInfo.name));
-        intent.setType(shareType);*/
 
         this.checkShareContentType(model, intentAction);
     }
@@ -99,11 +134,9 @@ public class ShareCore {
                     }
                     contentToShare = builder.toString();
                 } else {
-                    contentToShare = shareTextContent;
+                    contentToShare = shareContent;
                 }
-//                intent.setAction(intentAction);
-//                intent.putExtra(Intent.EXTRA_TEXT, contentToShare);
-//                startActivity(intent);
+
                 if (callback != null)
                     this.callback.onShareText(model, contentToShare, intentAction);
                 else if (baseCallback != null)
@@ -114,17 +147,11 @@ public class ShareCore {
                 if (shareListContent != null && shareListContent.size() > 0) {
                     intentAction = Intent.ACTION_SEND_MULTIPLE;
                     uriValues = parseStringsToUri(shareListContent);
-                    /*intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriValues);
-                    intent.setAction(intentAction);*/
                 } else {
                     uriValues = new ArrayList<>();
-                    final Uri fileUri = Uri.parse(shareTextContent);
+                    final Uri fileUri = Uri.parse(shareContent);
                     uriValues.add(fileUri);
-                    /*intent.putExtra(Intent.EXTRA_STREAM, fileUri);
-                    intent.setAction(intentAction);*/
                 }
-                /*intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivity(intent);*/
                 this.callback.onShareFile(model, uriValues, intentAction);
                 break;
         }
@@ -139,19 +166,51 @@ public class ShareCore {
         return uris;
     }
 
+    /**
+     * Allows to set base version of {@link ShareListener} that only provides information about
+     * text type shared content
+     *
+     * @param baseCallback pointer to class that implements {@link ShareTextListener} interface
+     */
     public void setBaseCallback(ShareTextListener baseCallback) {
         this.baseCallback = baseCallback;
     }
 
+    /**
+     * Allows to set type of current shared content
+     *
+     * @param shareType {@link String} value that inform about current sharing content type
+     */
     public void setShareType(String shareType) {
         this.shareType = shareType;
     }
 
+    /**
+     * Return current type of shared content
+     *
+     * @return {@link String}
+     */
     public String getShareType() {
         return shareType;
     }
 
+    /**
+     * Allows to set content to share that should be shared
+     *
+     * @param shareContent {@link String} value that represent content
+     */
+    public void setShareContent(String shareContent) {
+        this.shareContent = shareContent;
+    }
 
+    /**
+     * Allows to set content to share that should be shared
+     *
+     * @param shareListContent {@link ArrayList<String>} value that represent contents
+     */
+    public void setShareContent(ArrayList<String> shareListContent) {
+        this.shareListContent = shareListContent;
+    }
 
     public interface ShareListener extends ShareTextListener {
         void onShareFile(ShareActionModel model, ArrayList<Uri> contentToShare, String intentAction);
