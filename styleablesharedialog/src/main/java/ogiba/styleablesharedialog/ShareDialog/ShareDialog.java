@@ -218,7 +218,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
         if (model.getAppInfo() != null)
             intent.setComponent(new ComponentName(model.getAppInfo().activityInfo.packageName,
                     model.getAppInfo().activityInfo.name));
-        intent.setType(shareCore.getShareType());
+        intent.setType(shareCore.getShareType().toString());
         intent.putExtra(Intent.EXTRA_TEXT, contentToShare);
         startActivity(intent);
     }
@@ -231,7 +231,7 @@ public class ShareDialog extends DialogFragment implements ShareItemsAdapter.OnS
             intent.setComponent(new ComponentName(model.getAppInfo().activityInfo.packageName,
                     model.getAppInfo().activityInfo.name));
 
-        intent.setType(shareCore.getShareType());
+        intent.setType(shareCore.getShareType().toString());
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         if (contentToShare.size() > 1)
