@@ -22,8 +22,8 @@ android {
         applicationId "ogiba.stylablesharedialog"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 3
-        versionName "1.1.1"
+        versionCode 1120
+        versionName "1.1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
