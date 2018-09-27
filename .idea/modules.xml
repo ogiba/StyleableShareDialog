@@ -4,7 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/StylableShareDialog.iml" filepath="$PROJECT_DIR$/StylableShareDialog.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/styleablesharedialog.iml" filepath="$PROJECT_DIR$/styleablesharedialog.iml" />
       <module fileurl="file://$PROJECT_DIR$/styleablesharedialog/styleablesharedialog.iml" filepath="$PROJECT_DIR$/styleablesharedialog/styleablesharedialog.iml" />
+      <module fileurl="file://$PROJECT_DIR$/styleablesharedialog/styleablesharedialog-styleablesharedialog.iml" filepath="$PROJECT_DIR$/styleablesharedialog/styleablesharedialog-styleablesharedialog.iml" />
     </modules>
   </component>
 </project>
